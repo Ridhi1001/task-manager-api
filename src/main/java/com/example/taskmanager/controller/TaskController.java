@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -15,13 +16,19 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
-    @PostMapping
-    public Task createTask(@RequestBody Task task,
-                           @RequestParam Long userId,
-                           @RequestParam(required = false) String timeZone) {
-        // Pass the task, userId, and timeZone to the service
-        return taskService.createTask(task, userId, timeZone);
-    }
+@PostMapping
+public Task createTask(@RequestBody Map<String, Object> payload) {
+    Long userId = Long.valueOf(payload.get("assignedTo").toString());
+    String timeZone = (String) payload.get("timeZone");
+
+    Task task = new Task();
+    task.setTitle((String) payload.get("title"));
+    task.setDescription((String) payload.get("description"));
+    task.setStatus((String) payload.get("status"));
+
+    return taskService.createTask(task, userId, timeZone);
+}
+
 
     @GetMapping
     public List<Task> getAllTasks() {
